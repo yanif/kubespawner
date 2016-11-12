@@ -4,7 +4,7 @@ setup(
     name='jupyterhub-kubespawner',
     version='0.5',
     install_requires=[
-        'jupyterhub',
+        'jupyterhub>=0.7',
         'pyyaml',
     ],
     setup_requires=['pytest-runner'],
