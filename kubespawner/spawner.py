@@ -384,14 +384,14 @@ class KubeSpawner(Spawner):
         # kubernetes API to the users in the spawned pods.
         # See https://github.com/kubernetes/kubernetes/issues/16779#issuecomment-157460294
         hack_volumes = []
-        if not with_api_access:
+        if not self.with_api_access:
             hack_volumes = [{
                 'name': 'no-api-access-please',
                 'emptyDir': {}
             }]
 
         hack_volume_mounts = []
-        if not with_api_access:
+        if not self.with_api_access:
             hack_volume_mounts = [{
                 'name': 'no-api-access-please',
                 'mountPath': '/var/run/secrets/kubernetes.io/serviceaccount',
