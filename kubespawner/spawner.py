@@ -11,7 +11,7 @@ from urllib.parse import urlparse, urlunparse
 
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient, HTTPError
-from traitlets import Unicode, List, Integer, Float, Dict
+from traitlets import Unicode, List, Integer, Float, Dict, Bool
 from jupyterhub.spawner import Spawner
 
 from kubespawner.utils import request_maker, k8s_url
@@ -42,7 +42,7 @@ class KubeSpawner(Spawner):
         else:
             self.accessible_hub_api_url = self.hub.api_url
 
-    with_api_access = False
+    with_api_access = Bool(False, config=True, help="Enable k8s API access within the notebook pod")
 
     namespace = Unicode(
         config=True,
