@@ -11,7 +11,7 @@ from urllib.parse import urlparse, urlunparse
 
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient, HTTPError
-from traitlets import Unicode, List, Integer, Float
+from traitlets import Unicode, List, Integer, Float, Dict
 from jupyterhub.spawner import Spawner
 
 from kubespawner.utils import request_maker, k8s_url
@@ -143,6 +143,19 @@ class KubeSpawner(Spawner):
         """
         return self.hub.server.port
 
+    node_selector = Dict(
+        config=True,
+        help="""
+        Node selector to be used by pods.
+
+        This enables kubernetes to scheduler pods on a specific set of nodes
+        in the cluster, for example with:
+        ```
+        c.KubeSpawner.node_selector = {'disktype' : 'ssd'}
+        ```
+        """
+    )
+
     singleuser_image_spec = Unicode(
         'jupyter/singleuser:latest',
         config=True,
@@ -229,6 +242,7 @@ class KubeSpawner(Spawner):
         for more details.
         """
     )
+
     volumes = List(
         [],
         config=True,
@@ -389,6 +403,7 @@ class KubeSpawner(Spawner):
             self.cpu_guarantee,
             self.mem_limit,
             self.mem_guarantee,
+            self.node_selector
         )
 
     def get_pvc_manifest(self):

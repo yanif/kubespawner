@@ -13,7 +13,8 @@ def make_pod_spec(
     cpu_limit,
     cpu_guarantee,
     mem_limit,
-    mem_guarantee
+    mem_guarantee,
+    node_selector
 ):
     """
     Make a k8s pod specification for running a user notebook.
@@ -61,13 +62,15 @@ def make_pod_spec(
         String specifying the max amount of RAM the user's pod is guaranteed
         to have access to. String ins loat/int since common suffixes
         are allowed
+      - node_selector:
+        Dictionary of node selector labels for matching.
     """
     pod_security_context = {}
     if run_as_uid is not None:
         pod_security_context['runAsUser'] = int(run_as_uid)
     if fs_gid is not None:
         pod_security_context['fsGroup'] = int(fs_gid)
-    return {
+    pod_spec = {
         'apiVersion': 'v1',
         'kind': 'Pod',
         'metadata': {
@@ -106,6 +109,10 @@ def make_pod_spec(
             'volumes': volumes
         }
     }
+    # Add selectors if we have a non-empty 'node_selector' dictionary
+    if node_selector:
+        pod_spec['spec']['nodeSelector'] = node_selector
+    return pod_spec
 
 
 def make_pvc_spec(
