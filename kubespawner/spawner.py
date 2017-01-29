@@ -42,6 +42,8 @@ class KubeSpawner(Spawner):
         else:
             self.accessible_hub_api_url = self.hub.api_url
 
+    with_api_access = False
+
     namespace = Unicode(
         config=True,
         help="""
@@ -381,15 +383,21 @@ class KubeSpawner(Spawner):
         # This makes sure that we don't accidentally give access to the whole
         # kubernetes API to the users in the spawned pods.
         # See https://github.com/kubernetes/kubernetes/issues/16779#issuecomment-157460294
-        hack_volumes = [{
-            'name': 'no-api-access-please',
-            'emptyDir': {}
-        }]
-        hack_volume_mounts = [{
-            'name': 'no-api-access-please',
-            'mountPath': '/var/run/secrets/kubernetes.io/serviceaccount',
-            'readOnly': True
-        }]
+        hack_volumes = []
+        if not with_api_access:
+            hack_volumes = [{
+                'name': 'no-api-access-please',
+                'emptyDir': {}
+            }]
+
+        hack_volume_mounts = []
+        if not with_api_access:
+            hack_volume_mounts = [{
+                'name': 'no-api-access-please',
+                'mountPath': '/var/run/secrets/kubernetes.io/serviceaccount',
+                'readOnly': True
+            }]
+
         return make_pod_spec(
             self.pod_name,
             self.singleuser_image_spec,
